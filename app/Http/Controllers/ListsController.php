@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\http\Requests\ListFormRequest;
 
 use App\Todolist;
+use App\Category;
 
 class ListsController extends Controller
 {
@@ -31,7 +33,9 @@ class ListsController extends Controller
      */
     public function create()
     {
-        //
+
+        $categories = Category::lists('name', 'id');
+        return View('lists.create', compact('categories'));
     }
 
     /**
@@ -40,9 +44,21 @@ class ListsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ListFormRequest $request)
     {
-        //
+        $list = new Todolist(array(
+            'name'=> $request->get('name'), 
+            'description' => $request->get('description')
+
+        ));
+
+        $list->save();
+
+        if (count($request->get('categories')) > 0) {
+            $list->categories()->attach($request->get('categories'));
+        }
+
+        return \Redirect::route('lists.create')->with('message', 'Your list has been created!');
     }
 
     /**
@@ -69,6 +85,9 @@ class ListsController extends Controller
     public function edit($id)
     {
         //
+        $list = Todolist::find($id);
+
+        return View('lists.edit', compact('list'));
     }
 
     /**
@@ -78,9 +97,15 @@ class ListsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ListFormRequest $request, $id)
     {
-        //
+        $list = Todolist::find($id);
+
+        $list->update([
+            'name' => $request->get('name'),
+            'description' => $request->get('description')
+            ]);
+        return \Redirect::route('lists.edit', array($list->id))->with('message', 'Your list has been updated!');
     }
 
     /**

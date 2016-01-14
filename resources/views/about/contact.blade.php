@@ -2,16 +2,20 @@
 
 @section('content')
 <h2> Contact Todoparrot </h2>
-
-{{-- <ul>
+ 
+<ul>
 
 	@foreach($errors->all() as $error)
 	<li> {{$error}} </li>
 	@endforeach
 
 </ul> 
---}}
 
+@if(Session::has('message'))
+	<div class = "alert alert-info"> 
+			{{ Session::get('message')}}
+	</div>
+@endif
 {!! Form::open( array( 'route' => 'contact_store', 'class' => 'form')) !!}
 
 <div class = "form-group">
